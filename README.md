@@ -18,6 +18,73 @@ export ALICLOUD_SECRET_KEY=XXX
 packer build ack-centos.json
 ```
 
+## RAM Policy
+
+If you are using a sub account，the ram policy should at least include actions as below:
+
+```
+{
+    "Version": "1",
+    "Statement": [
+        {
+            "Action": [
+                "ecs:DescribeImages",
+                "ecs:CreateImage",
+                "ecs:ModifyImageSharePermission",
+                "ecs:CreateKeyPair",
+                "ecs:DeleteKeyPairs",
+                "ecs:DetachKeyPair",
+                "ecs:AttachKeyPair",
+                "ecs:CreateSecurityGroup",
+                "ecs:DeleteSecurityGroup",
+                "ecs:AuthorizeSecurityGroupEgress",
+                "ecs:AuthorizeSecurityGroup",
+                "ecs:CreateSnapshot",
+                "ecs:AttachDisk",
+                "ecs:DetachDisk",
+                "ecs:DescribeDisks",
+                "ecs:CreateDisk",
+                "ecs:DeleteDisk",
+                "ecs:CreateNetworkInterface",
+                "ecs:DescribeNetworkInterfaces",
+                "ecs:AttachNetworkInterface",
+                "ecs:DetachNetworkInterface",
+                "ecs:DeleteNetworkInterface",
+                "ecs:DescribeInstanceAttribute",
+                "ecs:CreateInstance",
+                "ecs:DeleteInstance",
+                "ecs:StartInstance",
+                "ecs:StopInstance",
+                "ecs:DescribeInstances"
+            ],
+            "Resource": [
+                "*"
+            ],
+            "Effect": "Allow"
+        },
+        {
+            "Action": [
+                "vpc:CreateVpc",
+                "vpc:DeleteVpc",
+                "vpc:DescribeVpcs",
+                "vpc:CreateVSwitch",
+                "vpc:DeleteVSwitch",
+                "vpc:DescribeVSwitches",
+                "vpc:AllocateEipAddress",
+                "vpc:AssociateEipAddress",
+                "vpc:UnassociateEipAddress",
+                "vpc:DescribeEipAddresses",
+                "vpc:ReleaseEipAddress"
+            ],
+            "Resource": [
+                "*"
+            ],
+            "Effect": "Allow"
+        }
+    ]
+}
+```
+
 ## Security
 
 For security issues or concerns, please do not open an issue or pull request on GitHub. Please report any suspected or confirmed security issues to Alibaba Cloud Container Security contact <kubernetes-security@service.aliyun.com>
