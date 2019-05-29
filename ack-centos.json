@@ -28,6 +28,7 @@
         "scripts/reboot.sh",
         "scripts/cleanUpKerneles.sh",
         "config/default.sh",
+        "scripts/updateDNS.sh",
         "scripts/verify.sh"
       ],
       "expect_disconnect": true
