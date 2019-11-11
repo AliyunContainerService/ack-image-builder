@@ -1,5 +1,7 @@
 # Image Build Specification of Alibaba Cloud Container Service for Kubernetes (ACK) 
 
+Notes: The template [ack-centos.json](https://github.com/AliyunContainerService/ack-image-builder/blob/master/ack-centos.json) is used for building custom image for ACK cluster based on the latest published ecs centos public image.
+
 This repository contains resources and configuration scripts for building a custom base OS Image for ACK with [HashiCorp Packer](https://www.packer.io/).
 
 ## Setup
