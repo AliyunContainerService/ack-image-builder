@@ -44,14 +44,27 @@ public::check::systemd() {
 public::check::systemd
 
 
-# func for checking if sshd is running and listen on port 22
-public::check::sshd() {
-    netstat -tlpn | grep "\b22\b" |grep sshd >/dev/null 2>&1
-    if [ $? -ne 0 ];then
-        public::common::log "Check if sshd is running and listen on port 22." "fail"
+# func for checking if permit root login using ssh key on port 22
+public::check::permitrootlogin() {
+    if [ -d "/root/.ssh" ]; then
+        cp -r /root/.ssh /root/.ssh_bak
+    fi
+    mkdir -p /tmp/ack-image-builder
+    ssh-keygen -t rsa -P '' -f '/tmp/ack-image-builder/id_rsa'
+    cat /tmp/ack-image-builder/id_rsa > /root/.ssh/id_rsa
+    cat /tmp/ack-image-builder/id_rsa.pub > /root/.ssh/authorized_keys
+    chmod 600 /root/.ssh/id_rsa
+    ssh -o PasswordAuthentication=no -o StrictHostKeyChecking=no root@127.0.0.1 "pwd"
+    if [ $? -ne 0 ]; then
+        public::common::log "Check if permit root login using ssh key on port 22." "fail"
         exit 1
     else
-        public::common::log "Check if sshd is running and listen on port 22." "pass"
+        rm -rf /root/.ssh
+        rm -rf /tmp/ack-image-builder
+        if [ -d "/root/.ssh_bak" ]; then
+            mv /root/.ssh_bak /root/.ssh
+        fi
+        public::common::log "Check if permit root login using ssh key on port 22." "pass"
     fi
 }
 
