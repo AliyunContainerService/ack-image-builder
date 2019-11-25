@@ -68,8 +68,8 @@ public::check::permitrootlogin() {
     fi
 }
 
-# check if sshd is running and listen on port 22
-public::check::sshd
+# checking if permit root login using ssh key on port 22
+public::check::permitrootlogin
 
 
 # func for checking if required tools are installed
