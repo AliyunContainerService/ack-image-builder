@@ -25,12 +25,8 @@
     {
       "type": "shell",
       "scripts": [
-        "scripts/updateKernel.sh",
-        "scripts/reboot.sh",
-        "scripts/cleanUpKerneles.sh",
-        "config/default.sh",
-        "scripts/updateDNS.sh",
-        "scripts/verify.sh"
+        "scripts/updateSystemd.sh",
+        "scripts/updateContainerd.sh"
       ],
       "expect_disconnect": true
     }

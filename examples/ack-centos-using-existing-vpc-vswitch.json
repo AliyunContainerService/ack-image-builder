@@ -2,7 +2,7 @@
   "variables": {
     "region": "cn-hangzhou",
     "image_name": "test_image{{timestamp}}",
-    "source_image": "centos_7_06_64_20G_alibase_20190711.vhd",
+    "source_image": "centos_7_06_64_20G_alibase_20190619.vhd",
     "instance_type": "ecs.g6.large",
     "vpc_id": "vpc-xxxxxx",
     "vswitch_id": "vsw-xxxxxx",
@@ -21,6 +21,7 @@
       "instance_type": "{{user `instance_type`}}",
       "vpc_id": "{{user `vpc_id`}}",
       "vswitch_id": "{{user `vswitch_id`}}",
+      "skip_image_validation": "true",
       "io_optimized": "true"
     }
   ],
