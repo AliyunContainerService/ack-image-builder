@@ -4,6 +4,11 @@ Notes: The template [ack-centos.json](https://github.com/AliyunContainerService/
 
 This repository contains resources and configuration scripts for building a custom base OS Image for ACK with [HashiCorp Packer](https://www.packer.io/).
 
+## Supported OS
+
+* CentOS 7.6/7.7
+* Aliyun Linux 2 (Alibaba Cloud Linux 2)
+
 ## Setup
 
 You must have [Packer](https://www.packer.io/) installed on your local system. For more information, see [Installing Packer](https://www.packer.io/docs/install/index.html) in the Packer documentation. You must also have Alibaba Cloud account credentials configured so that Packer can make calls to Alibaba Cloud API operations on your behalf.
