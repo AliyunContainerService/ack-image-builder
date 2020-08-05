@@ -2,7 +2,7 @@
   "variables": {
     "region": "cn-hangzhou",
     "image_name": "test_image{{timestamp}}",
-    "source_image": "aliyun_2_1903_x64_20G_uefi_alibase_20200616.vhd",
+    "source_image": "aliyun_2_1903_x64_20G_alibase_20200529.vhd",
     "instance_type": "ecs.g6.large",
     "access_key": "{{env `ALICLOUD_ACCESS_KEY`}}",
     "secret_key": "{{env `ALICLOUD_SECRET_KEY`}}"
@@ -29,6 +29,7 @@
         "scripts/reboot.sh",
         "scripts/cleanUpKerneles.sh",
         "config/default.sh",
+        "scripts/disableTuned.sh",
         "scripts/verify.sh"
       ],
       "expect_disconnect": true
