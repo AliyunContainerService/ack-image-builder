@@ -39,6 +39,8 @@ Notes: you need input the follow params:
 
 If you are using a sub account，the ram policy should at least include actions as below:
 
+> Note that you'd better release the delete permissions once you have completed your image build task for safety reasons.
+
 ```
 {
     "Version": "1",
