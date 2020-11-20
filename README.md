@@ -27,6 +27,7 @@ packer build examples/ack-centos.json
 ## Building in the kubernetes
 
 ```shell script
+make
 bash build/build.sh  examples/ack-kubernetes.json
 ```
 Notes: you need input the follow params:
