@@ -22,7 +22,7 @@ Execute following scripts in your shell
 ```
 export ALICLOUD_ACCESS_KEY=XXX
 export ALICLOUD_SECRET_KEY=XXX
-packer build ack-centos.json
+packer build examples/ack-centos.json
 ```
 ## Building in the kubernetes
 
