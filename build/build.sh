@@ -7,8 +7,13 @@ read  -p "The Docker version is:" DOCKER_VERSION
 read  -p "The kubernetes version is:" KUBE_VERSION
 
 ## check params
-if [[ -z $ACCESS_KEY || -z $SECRET_KEY || -z $REGION ]]; then
-   printf "[ERROR] `date '+%F %T'` following parameters is empty:\naccess_key=${ACCESS_KEY}\nsecret_key=${SECRET_KEY}\nregion=${REGION}\ninstance_type=${INSTANCE_TYPE}\nsource_image=${SOURCE_IMAGE}\nimage_name=${IMAGE_NAME}"
+if [[ -z $ACCESS_KEY || -z $SECRET_KEY || -z $REGION || -z $DOCKER_VERSION || -z $KUBE_VERSION ]]; then
+   echo -e "[ERROR] $(date '+%F %T') following parameters is empty:
+access_key=${ACCESS_KEY}
+secret_key=${SECRET_KEY}
+region=${REGION}
+docker_version=${DOCKER_VERSION}
+kube_version=${KUBE_VERSION}"
    exit 0
 fi
 
