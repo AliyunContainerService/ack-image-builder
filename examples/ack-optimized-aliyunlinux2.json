@@ -1,8 +1,8 @@
 {
   "variables": {
     "region": "cn-hangzhou",
-    "image_name": "test_image{{timestamp}}",
-    "source_image": "centos_7_7_x64_20G_alibase_20200426.vhd",
+    "image_name": "ack-optimized_image{{timestamp}}",
+    "source_image": "aliyun_2_1903_x64_20G_alibase_20200904.vhd",
     "instance_type": "ecs.g6.large",
     "access_key": "{{env `ALICLOUD_ACCESS_KEY`}}",
     "secret_key": "{{env `ALICLOUD_SECRET_KEY`}}"
@@ -25,14 +25,8 @@
     {
       "type": "shell",
       "scripts": [
-        "scripts/updateKernel.sh",
-        "scripts/reboot.sh",
-        "scripts/cleanUpKerneles.sh",
-        "config/default.sh",
-        "scripts/updateDNS.sh",
-        "scripts/verify.sh"
-      ],
-      "expect_disconnect": true
+          "scripts/ack-optimized-os.sh"
+      ]
     }
   ]
 }

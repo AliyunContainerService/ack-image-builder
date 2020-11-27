@@ -2,7 +2,7 @@
   "variables": {
     "region": "cn-hangzhou",
     "image_name": "test_image{{timestamp}}",
-    "source_image": "aliyun_2_1903_x64_20G_alibase_20200529.vhd",
+    "source_image": "aliyun_2_1903_x64_20G_alibase_20200904.vhd",
     "instance_type": "ecs.g6.large",
     "access_key": "{{env `ALICLOUD_ACCESS_KEY`}}",
     "secret_key": "{{env `ALICLOUD_SECRET_KEY`}}"
