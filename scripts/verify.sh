@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 REQUIRED_TOOLS=("cloud-init" "wget" "curl")
-CLEANUP_TOOLS=("kubeadm" "kubelet" "kubectl" "kubernetes-cni")
+CLEANUP_TOOLS=("kubeadm" "kubelet" "kubectl" "kubernetes-cni" "docker")
 REQUIRED_KERNEL_VERSION=3.10
 REQUIRED_SYSTEMD_VERSION=219
 
@@ -82,6 +82,13 @@ public::check::requiredtools() {
             exit 1
         else
             public::common::log "Check if $required_tool is installed." "pass"
+        fi
+        $required_tool --version > /dev/null 2>&1
+        if [ $? -ne 0 ];then
+            public::common::log "$required_tool is installed, but run $required_tool --version failed, may not work well." "fail"
+            exit 1
+        else
+            public::common::log "Check if run $required_tool --version is ok." "pass"
         fi
     done
 }
