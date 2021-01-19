@@ -17,10 +17,6 @@ download_pkg() {
 }
 
 source_file() {
-    pwd_dir=$(pwd)
-    echo $pwd_dir >&2
-    ls >&2
-    ls $SRC_DIR  >&2
     source pkg/run/$KUBE_VERSION/kubernetes.sh --role source
 }
 
@@ -38,7 +34,6 @@ alsa-lib
 alsa-tools-firmware
 authconfig
 avahi-libs
-bc
 bind-libs-lite
 bind-license
 biosdevname
@@ -152,17 +147,19 @@ pull_image() {
     docker pull  registry-vpc.${REGION}.aliyuncs.com/acs/coredns:1.6.7
 }
 
-enable_service() {
-    systemctl enable docker
-    systemctl enable kubelet
+update_os_release() {
+    sed -i  "s#LTS#LTS ACK-Optimized-OS#"  /etc/image-id
 }
 
-update_os_release() {
-    echo ACK-Optmized-OS="True"  >> /etc/os-release
+record_k8s_version() {
+    cat > /etc/ACK-Optimized-OS <<-EOF
+kubelet=$KUBE_VERSION
+docker=$DOCKER_VERSION
+EOF
 }
 
 cleanup() {
-    rm -rf $SRC_DIR/{addon*,docker*,kubernetes*,pkg,run*}
+    rm -rf ./{addon*,docker*,kubernetes*,pkg,run*}
 }
 
 main() {
@@ -175,8 +172,8 @@ main() {
     install_pkg
 
     pull_image
-    enable_service
     update_os_release
+    record_k8s_version
 }
 
 main

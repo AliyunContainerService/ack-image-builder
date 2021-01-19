@@ -24,6 +24,17 @@ export ALICLOUD_ACCESS_KEY=XXX
 export ALICLOUD_SECRET_KEY=XXX
 packer build examples/ack-centos.json
 ```
+
+## Build ACK-Optimized-OS image
+
+Execute following scripts in your shell
+
+```
+export ALICLOUD_ACCESS_KEY=XXX
+export ALICLOUD_SECRET_KEY=XXX
+packer build examples/ack-optimized-os.json
+```
+
 ## Building in the kubernetes
 
 ```shell script
