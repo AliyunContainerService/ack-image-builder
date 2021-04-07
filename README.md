@@ -6,8 +6,8 @@ This repository contains resources and configuration scripts for building a cust
 
 ## Supported OS
 
-* CentOS 7.6/7.7/7.8/7.9
 * Aliyun Linux 2 (Alibaba Cloud Linux 2)
+* CentOS 7.6/7.7/7.8/7.9
 
 ## Setup
 
@@ -35,7 +35,7 @@ export RUNTIME=XXX
 export ALICLOUD_REGION=XXX
 export ALICLOUD_ACCESS_KEY=XXX
 export ALICLOUD_SECRET_KEY=XXX
-packer build examples/ack-optimized-os-1.20.json
+packer build examples/ack-optimized-os-1.18.json
 ```
 NOTE: `RUNTIME` only support `docker` and `containerd`
 
