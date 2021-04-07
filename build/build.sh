@@ -30,6 +30,18 @@ check_params() {
     fi
 }
 
+check_env() {
+    if [[ -z $ALICLOUD_REGION || -z $ALICLOUD_ACCESS_KEY || -z $ALICLOUD_SECRET_KEY ]]; then
+        echo "ERROR: ALICLOUD_REGION/ALICLOUD_ACCESS_KEY/ALICLOUD_SECRET_KEY must be not empty"
+        return 1
+    fi
+
+    if [[ -z "$RUNTIME" ]]; then
+        echo "WARN: RUNTIME is empty, will set it 'docker' by default"
+        RUNTIME="docker"
+    fi
+}
+
 check_docker_image() {
     if docker inspect registry.aliyuncs.com/acs/ack-image-builder:v1.0.0 &>/dev/null; then
         :
@@ -39,11 +51,17 @@ check_docker_image() {
 }
 
 build_os_image() {
-    docker run -v $BUILD_TEMPLATE_FILE:$BUILD_TEMPLATE_FILE registry.aliyuncs.com/acs/ack-image-builder:v1.0.0  $file_path
+    docker run -e ALICLOUD_REGION=$ALICLOUD_REGION \
+               -e ALICLOUD_ACCESS_KEY=$ALICLOUD_ACCESS_KEY \
+               -e ALICLOUD_SECRET_KEY=$ALICLOUD_SECRET_KEY \
+               -e RUNTIME=$RUNTIME \
+               -v $BUILD_TEMPLATE_FILE:/scripts/$(basename $BUILD_TEMPLATE_FILE) \
+               registry.aliyuncs.com/acs/ack-image-builder:v1.0.0 /scripts/$(basename $BUILD_TEMPLATE_FILE)
 }
 
 main() {
     check_params "$@"
+    check_env
     check_docker_image
     build_os_image
 }
