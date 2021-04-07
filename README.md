@@ -15,25 +15,30 @@ You must have [Packer](https://www.packer.io/) installed on your local system. F
 
 For more information, see [Alibaba Cloud builder](https://www.packer.io/docs/builders/alicloud-ecs.html) in the Packer documentation.
 
-## Build ACK-Optimized-OS image
-
-Execute following scripts in your shell
-
-```
-export ALICLOUD_ACCESS_KEY=XXX
-export ALICLOUD_SECRET_KEY=XXX
-packer build examples/ack-optimized-os.json
-```
-
 ## Building the OS Image
 
 Execute following scripts in your shell
 
 ```
+export ALICLOUD_REGION=XXX
 export ALICLOUD_ACCESS_KEY=XXX
 export ALICLOUD_SECRET_KEY=XXX
-packer build examples/ack-centos.json
+packer build examples/ack-aliyunlinux2.json
 ```
+
+## Build ACK-Optimized-OS image
+
+Execute following scripts in your shell
+
+```
+export RUNTIME=XXX
+export ALICLOUD_REGION=XXX
+export ALICLOUD_ACCESS_KEY=XXX
+export ALICLOUD_SECRET_KEY=XXX
+packer build examples/ack-optimized-os-1.20.json
+```
+NOTE: `RUNTIME` only support `docker` and `containerd`
+
 
 ## RAM Policy
 
