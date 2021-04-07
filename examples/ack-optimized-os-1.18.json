@@ -5,7 +5,9 @@
     "instance_type": "ecs.g6.large",
     "region": "{{env `ALICLOUD_REGION`}}",
     "access_key": "{{env `ALICLOUD_ACCESS_KEY`}}",
-    "secret_key": "{{env `ALICLOUD_SECRET_KEY`}}"
+    "secret_key": "{{env `ALICLOUD_SECRET_KEY`}}",
+    "runtime": "{{env `RUNTIME`}}",
+    "skip_secrutiy_fix": "{{env `SKIP_SECURITY_FIX`}}"
   },
   "builders": [
     {
@@ -23,9 +25,16 @@
   ],
   "provisioners": [
     {
+      "type": "file",
+      "source": "scripts/ack-optimized-os-1.18.sh",
+      "destination": "/root/"
+    },
+    {
       "type": "shell",
-      "scripts": [
-          "scripts/ack-optimized-os-1.18.sh"
+      "inline": [
+        "export RUNTIME={{user `runtime`}}",
+        "export SKIP_SECURITY_FIX={{user `skip_secrutiy_fix`}}",
+        "bash /root/ack-optimized-os-1.18.sh"
       ]
     }
   ]

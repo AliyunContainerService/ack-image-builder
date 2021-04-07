@@ -3,13 +3,50 @@
 set -x
 set -e
 
-SRC_DIR=$(dirname $(readlink -e -v $0))
-OS="AliyunOS"
-DOCKER_VERSION="19.03.5"
-KUBE_VERSION="1.18.8-aliyun.1"
-REGION=$(curl --retry 10 -sSL http://100.100.100.200/latest/meta-data/region-id)
-PKG_FILE_SERVER="http://aliacs-k8s-$REGION.oss-$REGION-internal.aliyuncs.com/$BETA_VERSION"
-ACK_OPTIMIZED_OS_BUILD=1
+usage() {
+    cat >&2 <<-EOF
+Usage:
+    $0 -r RUNTIME [-s]
+
+Flags:
+    -r: sepcify container runtime, available value: docker and containerd
+    -s: skip security upgrade
+
+Example:
+    $0 -r docker -s
+    $0 -r docker
+    $0 -r containerd -s
+    $0 -r containerd
+EOF
+    exit 1
+}
+
+check_params() {
+    while getopts "r:sh" opt; do
+        case $opt in
+        r) RUNTIME="$OPTARG" ; ;;
+        s) SKIP_SECURITY_FIX="1" ; ;;
+        h | ?) usage ; ;;
+        esac
+    done
+
+    if [[ -z $RUNTIME ]] || [[ $RUNTIME != "docker" && $RUNTIME != "containerd" ]]; then
+        echo "ERROR: RUNTIME must not be empty, only support 'docker' and 'containerd' "
+        usage
+    fi
+}
+
+setup_env() {
+    export RUNTIME
+    export OS="AliyunOS"
+    export RUNTIME_VERSION="1.4.4"
+    export DOCKER_VERSION="19.03.5"
+    export KUBE_VERSION="1.18.8-aliyun.1"
+    export REGION=$(curl --retry 10 -sSL http://100.100.100.200/latest/meta-data/region-id)
+    export PKG_FILE_SERVER="http://aliacs-k8s-$REGION.oss-$REGION-internal.aliyuncs.com/$BETA_VERSION"
+    export ACK_OPTIMIZED_OS_BUILD=1
+}
+
 
 download_pkg() {
     curl --retry 4 $PKG_FILE_SERVER/public/pkg/run/run-${KUBE_VERSION}.tar.gz -O
@@ -130,21 +167,27 @@ wl1000-firmware
 wpa_supplicant
 xfsprogs
 "
-    for pkg in $pkg_list; do
-        yum remove -y $pkg
-    done
-
+    yum remove -y $pkg_list
     rm -rf /lib/modules/$(uname -r)/kernel/drivers/{media,staging,gpu,usb}
     rm -rf /boot/*-rescue-* /boot/*3.10.0* /usr/share/{doc,man} /usr/src
 }
 
 pull_image() {
-    systemctl start docker
-    sleep 3
+    if [[ "$RUNTIME" = "docker" ]]; then
+        systemctl start docker
+        sleep 10
 
-    docker pull  registry-vpc.${REGION}.aliyuncs.com/acs/kube-proxy:v${KUBE_VERSION}
-    docker pull  registry-vpc.${REGION}.aliyuncs.com/acs/pause:3.2
-    docker pull  registry-vpc.${REGION}.aliyuncs.com/acs/coredns:1.6.7
+        docker pull registry-vpc.${REGION}.aliyuncs.com/acs/kube-proxy:v${KUBE_VERSION}
+        docker pull registry-vpc.${REGION}.aliyuncs.com/acs/pause:3.2
+        docker pull registry-vpc.${REGION}.aliyuncs.com/acs/coredns:1.6.7
+    else
+        systemctl start containerd
+        sleep 10
+
+        ctr -n k8s.io i pull registry-vpc.${REGION}.aliyuncs.com/acs/kube-proxy:v${KUBE_VERSION}
+        ctr -n k8s.io i pull registry-vpc.${REGION}.aliyuncs.com/acs/pause:3.2
+        ctr -n k8s.io i pull registry-vpc.${REGION}.aliyuncs.com/acs/coredns:1.6.7
+    fi
 }
 
 update_os_release() {
@@ -158,6 +201,12 @@ docker=$DOCKER_VERSION
 EOF
 }
 
+post_install() {
+    if [[ $SKIP_SECURITY_FIX ]]; then
+        touch /var/.skip-security-fix
+    fi
+}
+
 cleanup() {
     rm -rf ./{addon*,docker*,kubernetes*,pkg,run*}
 }
@@ -165,10 +214,13 @@ cleanup() {
 main() {
     trap 'cleanup' EXIT
 
-    download_pkg
-    source_file
+    check_params "$@"
+    setup_env
 
     trim_os
+
+    download_pkg
+    source_file
     install_pkg
 
     pull_image
@@ -176,4 +228,4 @@ main() {
     record_k8s_version
 }
 
-main
+main "$@"
