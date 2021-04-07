@@ -6,7 +6,7 @@ This repository contains resources and configuration scripts for building a cust
 
 ## Supported OS
 
-* CentOS 7.6/7.7
+* CentOS 7.6/7.7/7.8/7.9
 * Aliyun Linux 2 (Alibaba Cloud Linux 2)
 
 ## Setup
@@ -14,16 +14,6 @@ This repository contains resources and configuration scripts for building a cust
 You must have [Packer](https://www.packer.io/) installed on your local system. For more information, see [Installing Packer](https://www.packer.io/docs/install/index.html) in the Packer documentation. You must also have Alibaba Cloud account credentials configured so that Packer can make calls to Alibaba Cloud API operations on your behalf.
 
 For more information, see [Alibaba Cloud builder](https://www.packer.io/docs/builders/alicloud-ecs.html) in the Packer documentation.
-
-## Building the OS Image
-
-Execute following scripts in your shell
-
-```
-export ALICLOUD_ACCESS_KEY=XXX
-export ALICLOUD_SECRET_KEY=XXX
-packer build examples/ack-centos.json
-```
 
 ## Build ACK-Optimized-OS image
 
@@ -33,6 +23,16 @@ Execute following scripts in your shell
 export ALICLOUD_ACCESS_KEY=XXX
 export ALICLOUD_SECRET_KEY=XXX
 packer build examples/ack-optimized-os.json
+```
+
+## Building the OS Image
+
+Execute following scripts in your shell
+
+```
+export ALICLOUD_ACCESS_KEY=XXX
+export ALICLOUD_SECRET_KEY=XXX
+packer build examples/ack-centos.json
 ```
 
 ## Building in the kubernetes
