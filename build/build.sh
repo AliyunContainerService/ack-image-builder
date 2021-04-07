@@ -1,25 +1,52 @@
 #!/bin/bash
-##
-read  -p "Please input the AliCloud access_key:" ACCESS_KEY
-read  -p "Please input the AliCloud secret_key:" SECRET_KEY
-read  -p "The Alicloud region is: " REGION
-read  -p "The Docker version is:" DOCKER_VERSION
-read  -p "The kubernetes version is:" KUBE_VERSION
 
-## check params
-if [[ -z $ACCESS_KEY || -z $SECRET_KEY || -z $REGION || -z $DOCKER_VERSION || -z $KUBE_VERSION ]]; then
-   echo -e "[ERROR] $(date '+%F %T') following parameters is empty:
-access_key=${ACCESS_KEY}
-secret_key=${SECRET_KEY}
-region=${REGION}
-docker_version=${DOCKER_VERSION}
-kube_version=${KUBE_VERSION}"
-   exit 0
-fi
+set -x
+set -e
 
+CUR_DIR=$(dirname $(readlink -e -v ${BASH_SOURCE[0]}))
+SRC_DIR=$(dirname $CUR_DIR)
 
-file_path="$(pwd)/$1"
+usage() {
+    cat >&2 <<-EOF
+Usage:
+    $0 build_template_file
+Example:
+    $0 $SRC_DIR/examples/ack-aliyunlinux2.json
+EOF
+}
 
-##build OS image
-docker run -e ALICLOUD_ACCESS_KEY=$ACCESS_KEY -e ALICLOUD_SECRET_KEY=$SECRET_KEY  -e REGION=$REGION  -e KUBE_VERSION=$KUBE_VERSION \
--e DOCKER_VERSION=$DOCKER_VERSION  -v $file_path:$file_path registry.aliyuncs.com/acs/ack-image-builder:v1.0.0  $file_path
+check_params() {
+    BUILD_TEMPLATE_FILE="$1"
+
+    if [[ -z $BUILD_TEMPLATE_FILE ]]; then
+        echo "ERROR: must be specify one template file"
+        usage
+        return 1
+    fi
+
+    if ! [[ -f $BUILD_TEMPLATE_FILE ]]; then
+        echo "ERROR: cannot find file: $BUILD_TEMPLATE_FILE"
+        return 1
+    fi
+}
+
+check_docker_image() {
+    if docker inspect registry.aliyuncs.com/acs/ack-image-builder:v1.0.0 &>/dev/null; then
+        :
+    else
+        make
+    fi
+}
+
+build_os_image() {
+    docker run -v $BUILD_TEMPLATE_FILE:$BUILD_TEMPLATE_FILE registry.aliyuncs.com/acs/ack-image-builder:v1.0.0  $file_path
+}
+
+main() {
+    check_params "$@"
+    check_docker_image
+    build_os_image
+}
+
+main "$@"
+
