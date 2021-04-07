@@ -2,7 +2,7 @@
   "variables": {
     "region": "cn-hangzhou",
     "image_name": "test_image{{timestamp}}",
-    "source_image": "centos_7_7_x64_20G_alibase_20200426.vhd",
+    "source_image": "centos_7_9_x64_20G_alibase_20210128.vhd",
     "instance_type": "ecs.g6.large",
     "vpc_id": "vpc-xxxxxx",
     "vswitch_id": "vsw-xxxxxx",
