@@ -35,18 +35,6 @@ export ALICLOUD_SECRET_KEY=XXX
 packer build examples/ack-centos.json
 ```
 
-## Building in the kubernetes
-
-```shell script
-make
-bash build/build.sh  examples/ack-kubernetes.json
-```
-Notes: you need input the follow params:
-- [Alicloud ACCESS_KEY](https://help.aliyun.com/document_detail/53045.html?spm=a2c4g.11186623.2.18.60be682bppY9d0#concept-53045-zh)
-- [Alicloud SECRET_KEY](https://help.aliyun.com/document_detail/53045.html?spm=a2c4g.11186623.2.18.60be682blplKSc#concept-53045-zh)
-- [REGION](https://help.aliyun.com/document_detail/140601.html?spm=a2c4g.11186623.4.3.41b74c07HvI7Kj)
-- Docker Version
-- Kubernetes Version
 ## RAM Policy
 
 If you are using a sub account，the ram policy should at least include actions as below:
