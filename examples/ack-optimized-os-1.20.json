@@ -1,0 +1,41 @@
+{
+  "variables": {
+    "image_name": "ack-optimized_image-1.20-{{timestamp}}",
+    "source_image": "aliyun_2_1903_x64_20G_alibase_20210120.vhd",
+    "instance_type": "ecs.g6.large",
+    "region": "{{env `ALICLOUD_REGION`}}",
+    "access_key": "{{env `ALICLOUD_ACCESS_KEY`}}",
+    "secret_key": "{{env `ALICLOUD_SECRET_KEY`}}",
+    "runtime": "{{env `RUNTIME`}}",
+    "skip_secrutiy_fix": "{{env `SKIP_SECURITY_FIX`}}"
+  },
+  "builders": [
+    {
+      "type": "alicloud-ecs",
+      "access_key": "{{user `access_key`}}",
+      "secret_key": "{{user `secret_key`}}",
+      "region": "{{user `region`}}",
+      "image_name": "{{user `image_name`}}",
+      "source_image": "{{user `source_image`}}",
+      "ssh_username": "root",
+      "instance_type": "{{user `instance_type`}}",
+      "skip_image_validation": "true",
+      "io_optimized": "true"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "scripts/ack-optimized-os-1.20.sh",
+      "destination": "/root/"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "export RUNTIME={{user `runtime`}}",
+        "export SKIP_SECURITY_FIX={{user `skip_secrutiy_fix`}}",
+        "bash /root/ack-optimized-os-1.20.sh"
+      ]
+    }
+  ]
+}
