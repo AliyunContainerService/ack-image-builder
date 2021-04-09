@@ -6,8 +6,8 @@ This repository contains resources and configuration scripts for building a cust
 
 ## Supported OS
 
-* CentOS 7.6/7.7
 * Aliyun Linux 2 (Alibaba Cloud Linux 2)
+* CentOS 7.6/7.7/7.8/7.9
 
 ## Setup
 
@@ -20,9 +20,10 @@ For more information, see [Alibaba Cloud builder](https://www.packer.io/docs/bui
 Execute following scripts in your shell
 
 ```
+export ALICLOUD_REGION=XXX
 export ALICLOUD_ACCESS_KEY=XXX
 export ALICLOUD_SECRET_KEY=XXX
-packer build examples/ack-centos.json
+packer build examples/ack-aliyunlinux2.json
 ```
 
 ## Build ACK-Optimized-OS image
@@ -30,23 +31,15 @@ packer build examples/ack-centos.json
 Execute following scripts in your shell
 
 ```
+export RUNTIME=XXX
+export ALICLOUD_REGION=XXX
 export ALICLOUD_ACCESS_KEY=XXX
 export ALICLOUD_SECRET_KEY=XXX
-packer build examples/ack-optimized-os.json
+packer build examples/ack-optimized-os-1.18.json
 ```
+NOTE: `RUNTIME` only support `docker` and `containerd`
 
-## Building in the kubernetes
 
-```shell script
-make
-bash build/build.sh  examples/ack-kubernetes.json
-```
-Notes: you need input the follow params:
-- [Alicloud ACCESS_KEY](https://help.aliyun.com/document_detail/53045.html?spm=a2c4g.11186623.2.18.60be682bppY9d0#concept-53045-zh)
-- [Alicloud SECRET_KEY](https://help.aliyun.com/document_detail/53045.html?spm=a2c4g.11186623.2.18.60be682blplKSc#concept-53045-zh)
-- [REGION](https://help.aliyun.com/document_detail/140601.html?spm=a2c4g.11186623.4.3.41b74c07HvI7Kj)
-- Docker Version
-- Kubernetes Version
 ## RAM Policy
 
 If you are using a sub account，the ram policy should at least include actions as below:

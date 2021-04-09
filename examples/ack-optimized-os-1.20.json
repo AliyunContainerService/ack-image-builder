@@ -1,11 +1,13 @@
 {
   "variables": {
-    "region": "cn-hangzhou",
-    "image_name": "test_image{{timestamp}}",
+    "image_name": "ack-optimized_image-1.20-{{timestamp}}",
     "source_image": "aliyun_2_1903_x64_20G_alibase_20210120.vhd",
     "instance_type": "ecs.g6.2xlarge",
+    "region": "{{env `ALICLOUD_REGION`}}",
     "access_key": "{{env `ALICLOUD_ACCESS_KEY`}}",
-    "secret_key": "{{env `ALICLOUD_SECRET_KEY`}}"
+    "secret_key": "{{env `ALICLOUD_SECRET_KEY`}}",
+    "runtime": "{{env `RUNTIME`}}",
+    "skip_secrutiy_fix": "{{env `SKIP_SECURITY_FIX`}}"
   },
   "builders": [
     {
@@ -23,16 +25,17 @@
   ],
   "provisioners": [
     {
+      "type": "file",
+      "source": "scripts/ack-optimized-os-1.20.sh",
+      "destination": "/root/"
+    },
+    {
       "type": "shell",
-      "scripts": [
-        "scripts/updateKernel.sh",
-        "scripts/reboot.sh",
-        "scripts/cleanUpKerneles.sh",
-        "config/default.sh",
-        "scripts/disableTuned.sh",
-        "scripts/verify.sh"
-      ],
-      "expect_disconnect": true
+      "inline": [
+        "export RUNTIME={{user `runtime`}}",
+        "export SKIP_SECURITY_FIX={{user `skip_secrutiy_fix`}}",
+        "bash /root/ack-optimized-os-1.20.sh"
+      ]
     }
   ]
 }

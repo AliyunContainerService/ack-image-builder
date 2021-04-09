@@ -2,8 +2,8 @@
   "variables": {
     "region": "cn-hangzhou",
     "image_name": "test_image{{timestamp}}",
-    "source_image": "centos_7_7_x64_20G_alibase_20200426.vhd",
-    "instance_type": "ecs.g6.large",
+    "source_image": "centos_7_9_x64_20G_alibase_20210128.vhd",
+    "instance_type": "ecs.g6.2xlarge",
     "access_key": "{{env `ALICLOUD_ACCESS_KEY`}}",
     "secret_key": "{{env `ALICLOUD_SECRET_KEY`}}"
   },

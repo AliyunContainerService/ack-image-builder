@@ -1,13 +1,13 @@
 {
   "variables": {
-    "region": "{{env `REGION`}}",
-    "image_name": "test_image{{timestamp}}",
-    "source_image": "centos_7_7_x64_20G_alibase_20200426.vhd",
-    "instance_type": "ecs.g6.large",
+    "image_name": "ack-optimized_image-1.18-{{timestamp}}",
+    "source_image": "aliyun_2_1903_x64_20G_alibase_20210120.vhd",
+    "instance_type": "ecs.g6.2xlarge",
+    "region": "{{env `ALICLOUD_REGION`}}",
     "access_key": "{{env `ALICLOUD_ACCESS_KEY`}}",
     "secret_key": "{{env `ALICLOUD_SECRET_KEY`}}",
-    "docker_version": "{{env `DOCKER_VERSION`}}",
-    "kube_version": "{{env `KUBE_VERSION`}}"
+    "runtime": "{{env `RUNTIME`}}",
+    "skip_secrutiy_fix": "{{env `SKIP_SECURITY_FIX`}}"
   },
   "builders": [
     {
@@ -26,19 +26,15 @@
   "provisioners": [
     {
       "type": "file",
-      "source": "scripts/init.sh",
+      "source": "scripts/ack-optimized-os-1.18.sh",
       "destination": "/root/"
     },
     {
       "type": "shell",
       "inline": [
-        "export REGION={{user `region`}}",
-        "export PKG_FILE_SERVER=http://aliacs-k8s-$REGION.oss-$REGION-internal.aliyuncs.com",
-        "export CLOUD_TYPE=public",
-        "export OS=CentOS",
-        "export DOCKER_VERSION={{user `docker_version`}}",
-        "export KUBE_VERSION={{user `kube_version`}}",
-        "bash /root/init.sh"
+        "export RUNTIME={{user `runtime`}}",
+        "export SKIP_SECURITY_FIX={{user `skip_secrutiy_fix`}}",
+        "bash /root/ack-optimized-os-1.18.sh"
       ]
     }
   ]
