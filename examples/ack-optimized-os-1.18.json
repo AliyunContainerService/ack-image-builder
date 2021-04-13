@@ -1,7 +1,7 @@
 {
   "variables": {
     "image_name": "ack-optimized_image-1.18-{{timestamp}}",
-    "source_image": "aliyun_2_1903_x64_20G_alibase_20210120.vhd",
+    "source_image": "{{env `ALIBABA_CLOUD_LINUX_IMAGE_ID`}}",
     "instance_type": "ecs.g6.2xlarge",
     "region": "{{env `ALICLOUD_REGION`}}",
     "access_key": "{{env `ALICLOUD_ACCESS_KEY`}}",
