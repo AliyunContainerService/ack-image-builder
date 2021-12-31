@@ -213,7 +213,7 @@ cleanup() {
 }
 
 main() {
-    trap 'cleanup' EXIT
+#    trap 'cleanup' EXIT
 
     check_params "$@"
     setup_env
