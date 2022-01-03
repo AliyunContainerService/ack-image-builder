@@ -172,6 +172,13 @@ install_pkg() {
     ROLE=deploy-nodes pkg/run/$KUBE_VERSION/bin/kubernetes.sh
 }
 
+update_systemd() {
+        # 升级到新版本systemd-219-78.5.al7.3;
+        yum update -y systemd || true
+        systemctl daemon-reexec || true
+}
+
+
 pull_image() {
     if [[ "$RUNTIME" = "docker" ]]; then
         systemctl start docker
@@ -222,7 +229,7 @@ main() {
 
     download_pkg
     install_pkg
-
+    update_systemd
     pull_image
     update_os_release
     record_k8s_version
