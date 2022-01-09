@@ -223,7 +223,6 @@ main() {
 
     download_pkg
     install_pkg
-    update_systemd
     pull_image
     update_os_release
     record_k8s_version
