@@ -173,8 +173,6 @@ install_pkg() {
 }
 
 update_systemd() {
-        # 升级到新版本systemd-219-78.5.al7.3;
-        yum update -y systemd || true
         systemctl daemon-reexec || true
 }
 
@@ -220,7 +218,7 @@ cleanup() {
 }
 
 main() {
-#    trap 'cleanup' EXIT
+    trap 'cleanup' EXIT
 
     check_params "$@"
     setup_env
