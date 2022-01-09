@@ -172,10 +172,6 @@ install_pkg() {
     ROLE=deploy-nodes pkg/run/$KUBE_VERSION/bin/kubernetes.sh
 }
 
-update_systemd() {
-        systemctl daemon-reexec || true
-}
-
 
 pull_image() {
     if [[ "$RUNTIME" = "docker" ]]; then
