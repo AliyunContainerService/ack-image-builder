@@ -55,10 +55,6 @@ download_pkg() {
 
 source_file() {
 
-    echo "test"
-    export LOCAL_INSTANCE_TYPE=`${HTTP_META}/instance/instance-type`
-    echo LOCAL_INSTANCE_TYPE
-    echo ${HTTP_META}
     source pkg/run/$KUBE_VERSION/kubernetes.sh --role source
 }
 
