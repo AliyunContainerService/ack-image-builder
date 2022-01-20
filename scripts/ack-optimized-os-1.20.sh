@@ -227,8 +227,8 @@ main() {
     trim_os
 
     download_pkg
-    preset_gpu
     install_pkg
+    preset_gpu
     pull_image
     update_os_release
     record_k8s_version
