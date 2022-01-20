@@ -172,6 +172,11 @@ install_pkg() {
     ROLE=deploy-nodes pkg/run/$KUBE_VERSION/bin/kubernetes.sh
 }
 
+preset_gpu() {
+    if [[ $PRESET_GPU ]]; then
+        bash pkg/run/$KUBE_VERSION/lib/nvidia-gpu.sh
+    fi
+}
 
 pull_image() {
     if [[ "$RUNTIME" = "docker" ]]; then
