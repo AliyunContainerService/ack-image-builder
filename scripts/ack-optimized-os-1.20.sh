@@ -227,6 +227,7 @@ main() {
     trim_os
 
     download_pkg
+    preset_gpu
     install_pkg
     pull_image
     update_os_release
