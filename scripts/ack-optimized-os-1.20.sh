@@ -174,8 +174,7 @@ install_pkg() {
 
 preset_gpu() {
     if [[ $PRESET_GPU ]]; then
-        source pkg/run/$KUBE_VERSION/lib/nvidia-gpu.sh
-        nvidia::enable_gpu_capability
+        bash pkg/run/$KUBE_VERSION/bin/nvidia-gpu-installer.sh
     fi
 }
 
