@@ -175,7 +175,7 @@ install_pkg() {
 preset_gpu() {
     GPU_PACKAGE_URL=http://aliacs-k8s-${REGION}.oss-${REGION}-internal.aliyuncs.com/public/pkg
     if [[ $PRESET_GPU ]]; then
-        bash -x pkg/run/$KUBE_VERSION/bin/nvidia-gpu-installer.sh --package-url-prefix=${GPU_PACKAGE_URL}
+        bash -x pkg/run/$KUBE_VERSION/bin/nvidia-gpu-installer.sh --package-url-prefix ${GPU_PACKAGE_URL}
     fi
 }
 
