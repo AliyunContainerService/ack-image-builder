@@ -49,7 +49,7 @@ setup_env() {
 
 
 download_pkg() {
-    curl --retry 4 $PKG_FILE_SERVER/jiangbo/public/pkg/run/run-${KUBE_VERSION}.tar.gz -O
+    curl --retry 4 $PKG_FILE_SERVER/public/pkg/run/run-${KUBE_VERSION}.tar.gz -O
     tar -xvf run-${KUBE_VERSION}.tar.gz
 }
 
