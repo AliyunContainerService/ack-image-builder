@@ -62,6 +62,13 @@ install_pkg() {
     public::common::install_package
 }
 
+preset_gpu() {
+    GPU_PACKAGE_URL=http://aliacs-k8s-${REGION}.oss-${REGION}-internal.aliyuncs.com/public/pkg
+    if [[ $PRESET_GPU ]]; then
+        bash -x pkg/run/$KUBE_VERSION/bin/nvidia-gpu-installer.sh --package-url-prefix ${GPU_PACKAGE_URL}
+    fi
+}
+
 trim_os() {
     local pkg_list="acl
 aic94xx-firmware
@@ -222,7 +229,7 @@ main() {
     download_pkg
     source_file
     install_pkg
-
+    preset_gpu
     pull_image
     update_os_release
     record_k8s_version
