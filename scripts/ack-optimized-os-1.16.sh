@@ -41,15 +41,33 @@ setup_env() {
     export OS="AliyunOS"
     export RUNTIME_VERSION="1.4.4"
     export DOCKER_VERSION="19.03.5"
-    export CLOUD_TYPE="public"
-    export KUBE_VERSION="1.20.11-aliyun.1"
+    export KUBE_VERSION="1.16.9-aliyun.1"
     export REGION=$(curl --retry 10 -sSL http://100.100.100.200/latest/meta-data/region-id)
-    export PKG_FILE_SERVER="http://aliacs-k8s-$REGION.oss-$REGION-internal.aliyuncs.com/"
+    export PKG_FILE_SERVER="http://aliacs-k8s-$REGION.oss-$REGION-internal.aliyuncs.com/$BETA_VERSION"
     export ACK_OPTIMIZED_OS_BUILD=1
+}
 
-    mkdir -p /root/ack-deploy
-    cd /root/ack-deploy
 
+download_pkg() {
+    curl --retry 4 $PKG_FILE_SERVER/public/pkg/run/run-${KUBE_VERSION}.tar.gz -O
+    tar -xvf run-${KUBE_VERSION}.tar.gz
+}
+
+source_file() {
+
+    source pkg/run/$KUBE_VERSION/kubernetes.sh --role source
+}
+
+install_pkg() {
+    public::common::sync_ntpd
+    public::common::install_package
+}
+
+preset_gpu() {
+    GPU_PACKAGE_URL=http://aliacs-k8s-${REGION}.oss-${REGION}-internal.aliyuncs.com/public/pkg
+    if [[ $PRESET_GPU ]]; then
+        bash -x pkg/run/$KUBE_VERSION/bin/nvidia-gpu-installer.sh --package-url-prefix ${GPU_PACKAGE_URL}
+    fi
 }
 
 trim_os() {
@@ -157,26 +175,9 @@ wl1000-firmware
 wpa_supplicant
 xfsprogs
 "
-
     yum remove -y $pkg_list
     rm -rf /lib/modules/$(uname -r)/kernel/drivers/{media,staging,gpu,usb}
     rm -rf /boot/*-rescue-* /boot/*3.10.0* /usr/share/{doc,man} /usr/src
-}
-
-download_pkg() {
-    curl --retry 4 $PKG_FILE_SERVER/public/pkg/run/run-${KUBE_VERSION}.tar.gz -O
-    tar -zxvf run-${KUBE_VERSION}.tar.gz
-}
-
-install_pkg() {
-    ROLE=deploy-nodes pkg/run/$KUBE_VERSION/bin/kubernetes.sh
-}
-
-preset_gpu() {
-    GPU_PACKAGE_URL=http://aliacs-k8s-${REGION}.oss-${REGION}-internal.aliyuncs.com/public/pkg
-    if [[ $PRESET_GPU ]]; then
-        bash -x pkg/run/$KUBE_VERSION/bin/nvidia-gpu-installer.sh --package-url-prefix ${GPU_PACKAGE_URL}
-    fi
 }
 
 pull_image() {
@@ -186,25 +187,24 @@ pull_image() {
 
         docker pull registry-vpc.${REGION}.aliyuncs.com/acs/kube-proxy:v${KUBE_VERSION}
         docker pull registry-vpc.${REGION}.aliyuncs.com/acs/pause:3.2
-        docker pull registry-vpc.${REGION}.aliyuncs.com/acs/coredns:1.7.0
+        docker pull registry-vpc.${REGION}.aliyuncs.com/acs/coredns:1.6.7
     else
         systemctl start containerd
         sleep 10
 
         ctr -n k8s.io i pull registry-vpc.${REGION}.aliyuncs.com/acs/kube-proxy:v${KUBE_VERSION}
         ctr -n k8s.io i pull registry-vpc.${REGION}.aliyuncs.com/acs/pause:3.2
-        ctr -n k8s.io i pull registry-vpc.${REGION}.aliyuncs.com/acs/coredns:1.7.0
+        ctr -n k8s.io i pull registry-vpc.${REGION}.aliyuncs.com/acs/coredns:1.6.7
     fi
 }
 
 update_os_release() {
-    sed -i "s#LTS#LTS ACK-Optimized-OS#" /etc/image-id
+    sed -i  "s#LTS#LTS ACK-Optimized-OS#"  /etc/image-id
 }
 
 record_k8s_version() {
-    cat >/etc/ACK-Optimized-OS <<-EOF
+    cat > /etc/ACK-Optimized-OS <<-EOF
 kubelet=$KUBE_VERSION
-runtime=$RUNTIME
 docker=$DOCKER_VERSION
 EOF
 }
@@ -216,7 +216,7 @@ post_install() {
 }
 
 cleanup() {
-    rm -rf /root/ack-deploy
+    rm -rf ./{addon*,docker*,kubernetes*,pkg,run*}
 }
 
 main() {
@@ -228,12 +228,12 @@ main() {
     trim_os
 
     download_pkg
+    source_file
     install_pkg
     preset_gpu
     pull_image
     update_os_release
     record_k8s_version
-    post_install
 }
 
 main "$@"

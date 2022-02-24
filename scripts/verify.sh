@@ -74,6 +74,7 @@ public::check::permitrootlogin
 
 # func for checking if required tools are installed
 public::check::requiredtools() {
+    public::common::log "required tools list"
     for required_tool in ${REQUIRED_TOOLS[@]}
     do
         which $required_tool >/dev/null 2>&1
