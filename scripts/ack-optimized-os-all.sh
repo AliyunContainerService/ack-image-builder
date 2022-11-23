@@ -207,6 +207,9 @@ pull_image() {
 }
 
 update_os_release() {
+    if [[ ! -f /etc/image-id ]]; then
+      touch /etc/image-id
+    fi
     sed -i  "s#LTS#LTS ACK-Optimized-OS#"  /etc/image-id
 }
 
