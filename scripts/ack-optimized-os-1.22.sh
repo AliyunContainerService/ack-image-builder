@@ -39,13 +39,18 @@ check_params() {
 setup_env() {
     export RUNTIME
     export OS="AliyunOS"
-    export RUNTIME_VERSION="1.5.10"
-    export DOCKER_VERSION="19.03.5"
     export CLOUD_TYPE="public"
-    export KUBE_VERSION="1.20.11-aliyun.1"
+    export KUBE_VERSION="1.22.10-aliyun.1"
     export REGION=$(curl --retry 10 -sSL http://100.100.100.200/latest/meta-data/region-id)
     export PKG_FILE_SERVER="http://aliacs-k8s-$REGION.oss-$REGION-internal.aliyuncs.com/"
     export ACK_OPTIMIZED_OS_BUILD=1
+
+    if [[ "$RUNTIME" = "docker" ]]; then
+      RUNTIME_VERSION="19.03.5"
+      DOCKER_VERSION="19.03.5"
+    else
+      RUNTIME_VERSION="1.5.10"
+    fi
 
     mkdir -p /root/ack-deploy
     cd /root/ack-deploy
