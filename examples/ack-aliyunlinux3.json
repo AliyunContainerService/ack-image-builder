@@ -1,0 +1,43 @@
+{
+  "variables": {
+    "region": "cn-hangzhou",
+    "image_name": "test_image{{timestamp}}",
+    "source_image": "aliyun_3_x64_20G_alibase_20221102.vhd",
+    "instance_type": "ecs.g6.2xlarge",
+    "access_key": "{{env `ALICLOUD_ACCESS_KEY`}}",
+    "secret_key": "{{env `ALICLOUD_SECRET_KEY`}}"
+  },
+  "builders": [
+    {
+      "type": "alicloud-ecs",
+      "access_key": "{{user `access_key`}}",
+      "secret_key": "{{user `secret_key`}}",
+      "region": "{{user `region`}}",
+      "image_name": "{{user `image_name`}}",
+      "source_image": "{{user `source_image`}}",
+      "ssh_username": "root",
+      "instance_type": "{{user `instance_type`}}",
+      "skip_image_validation": "true",
+      "io_optimized": "true",
+      "associate_public_ip_address": "true"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "environment_vars": [
+        "CGROUP_MODE={{user `cgroup_mode`}}"
+      ],
+      "scripts": [
+        "scripts/set-cgroupv2.sh",
+        "scripts/updateKernel.sh",
+        "scripts/reboot.sh",
+        "scripts/cleanUpKerneles.sh",
+        "config/default.sh",
+        "scripts/disableTuned.sh",
+        "scripts/verify.sh"
+      ],
+      "expect_disconnect": true
+    }
+  ]
+}
