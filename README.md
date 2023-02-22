@@ -7,6 +7,7 @@ This repository contains resources and configuration scripts for building a cust
 ## Supported OS
 
 * Aliyun Linux 2 (Alibaba Cloud Linux 2)
+* Aliyun Linux 3 (Alibaba Cloud Linux 3)
 * CentOS 7.6/7.7/7.8/7.9
 
 ## Setup

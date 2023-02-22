@@ -77,6 +77,7 @@ preset_gpu() {
     GPU_PACKAGE_URL=http://aliacs-k8s-${REGION}.oss-${REGION}-internal.aliyuncs.com/public/pkg
     if [[ "$PRESET_GPU" == "true" ]]; then
         bash -x pkg/run/$KUBE_VERSION/bin/nvidia-gpu-installer.sh --package-url-prefix ${GPU_PACKAGE_URL}
+        rm -rf /etc/kubernetes/manifests/nvidia-device-plugin.yml
     fi
 }
 
