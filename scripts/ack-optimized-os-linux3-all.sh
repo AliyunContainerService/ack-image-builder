@@ -47,6 +47,8 @@ setup_env() {
       export RUNTIME_VERSION="1.5.10"
     fi
 
+    export RELEASE_VERSION=$(echo $KUBE_VERSION | awk -F. '{print $1"."$2}')
+
     export REGION=$(curl --retry 10 -sSL http://100.100.100.200/latest/meta-data/region-id)
     export PKG_FILE_SERVER="http://aliacs-k8s-$REGION.oss-$REGION-internal.aliyuncs.com/$BETA_VERSION"
     export ACK_OPTIMIZED_OS_BUILD=1
@@ -54,17 +56,17 @@ setup_env() {
 
 
 download_pkg() {
-    curl --retry 4 $PKG_FILE_SERVER/public/pkg/run/run-${KUBE_VERSION}.tar.gz -O
-    tar -xvf run-${KUBE_VERSION}.tar.gz
+    curl --retry 4 $PKG_FILE_SERVER/public/pkg/run/run-${RELEASE_VERSION}-linux-${OS_ARCH}.tar.gz -O
+    tar -xvf run-${RELEASE_VERSION}-linux-${OS_ARCH}.tar.gz
 }
 
 
 source_file() {
-    if [[ -e "pkg/run/$KUBE_VERSION/kubernetes.sh" ]]; then
-      source pkg/run/$KUBE_VERSION/kubernetes.sh --role source
+    if [[ -e "pkg/run/$RELEASE_VERSION/kubernetes.sh" ]]; then
+      source pkg/run/$RELEASE_VERSION/kubernetes.sh --role source
       install_pkg
-    elif [[ -e "pkg/run/$KUBE_VERSION/bin/kubernetes.sh" ]]; then
-      ROLE=deploy-nodes pkg/run/$KUBE_VERSION/bin/kubernetes.sh
+    elif [[ -e "pkg/run/$RELEASE_VERSION/bin/kubernetes.sh" ]]; then
+      ROLE=deploy-nodes pkg/run/$RELEASE_VERSION/bin/kubernetes.sh
     fi
 }
 
@@ -76,7 +78,7 @@ install_pkg() {
 preset_gpu() {
     GPU_PACKAGE_URL=http://aliacs-k8s-${REGION}.oss-${REGION}-internal.aliyuncs.com/public/pkg
     if [[ "$PRESET_GPU" == "true" ]]; then
-        bash -x pkg/run/$KUBE_VERSION/bin/nvidia-gpu-installer.sh --package-url-prefix ${GPU_PACKAGE_URL}
+        bash -x pkg/run/$RELEASE_VERSION/bin/nvidia-gpu-installer.sh --package-url-prefix ${GPU_PACKAGE_URL}
     fi
 }
 
