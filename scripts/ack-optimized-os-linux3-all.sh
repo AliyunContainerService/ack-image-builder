@@ -44,7 +44,8 @@ setup_env() {
       export RUNTIME_VERSION="19.03.5"
       export DOCKER_VERSION="19.03.5"
     else
-      export RUNTIME_VERSION="1.5.10"
+      RUNTIME_VERSION=${RUNTIME_VERSION:-1.6.20}
+      export RUNTIME_VERSION
     fi
 
     export RELEASE_VERSION=$(echo $KUBE_VERSION | awk -F. '{print $1"."$2}')
