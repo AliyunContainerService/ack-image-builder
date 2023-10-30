@@ -36,10 +36,59 @@ export RUNTIME=XXX
 export ALICLOUD_REGION=XXX
 export ALICLOUD_ACCESS_KEY=XXX
 export ALICLOUD_SECRET_KEY=XXX
-packer build examples/ack-optimized-os-1.18.json
+packer build examples/ack-optimized-os-all.json
 ```
 NOTE: `RUNTIME` only support `docker` and `containerd`
 
+```shell
+{
+  "variables": {
+    "image_name": "ack-optimized_image-1.20-{{timestamp}}",
+    "source_image": "aliyun_2_1903_x64_20G_alibase_20210120.vhd",
+    "instance_type": "ecs.gn6i-c4g1.xlarge",
+    "region": "{{env `ALICLOUD_REGION`}}",
+    "access_key": "{{env `ALICLOUD_ACCESS_KEY`}}",
+    "secret_key": "{{env `ALICLOUD_SECRET_KEY`}}",
+    "runtime": "{{env `RUNTIME`}}",
+    "skip_secrutiy_fix": "{{env `SKIP_SECURITY_FIX`}}"
+  },
+  "builders": [
+    {
+      "type": "alicloud-ecs",
+      "access_key": "{{user `access_key`}}",
+      "secret_key": "{{user `secret_key`}}",
+      "region": "{{user `region`}}",
+      "image_name": "{{user `image_name`}}",
+      "source_image": "{{user `source_image`}}",
+      "ssh_username": "root",
+      "instance_type": "{{user `instance_type`}}",
+      "skip_image_validation": "true",
+      "io_optimized": "true"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "scripts/ack-optimized-os-all.sh",
+      "destination": "/root/"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "export RUNTIME={{user `runtime`}}",
+        "export SKIP_SECURITY_FIX={{user `skip_secrutiy_fix`}}",
+        "export OS_ARCH=amd64",
+        "export PRESET_GPU=true",    # If you want to download gpu, set PRESET_GPU to true and also set instance_type to gpu instance, supports version 1.20+.
+        "export NVIDIA_DRIVER_VERSION=460.106.00",   #  You can set the gpu version, default is 460.91.03
+        "export KEEP_IMAGE_DATA=true",   #  If you cache images, you must set KEEP_IMAGE_DATA to true
+        "export KUBE_VERSION=1.26.3-aliyun.1",   #  Set KUBE_VERSION according to your cluster version
+        "bash /root/ack-optimized-os-all.sh",
+        "ctr -n k8s.io i pull docker.io/library/nginx:1.7.9"  #  You can cache images into OS image
+      ]
+    }
+  ]
+}
+```
 
 ## RAM Policy
 

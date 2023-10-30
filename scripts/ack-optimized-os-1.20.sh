@@ -39,17 +39,26 @@ check_params() {
 setup_env() {
     export RUNTIME
     export OS="AliyunOS"
-    export RUNTIME_VERSION="1.5.10"
-    export DOCKER_VERSION="19.03.5"
     export CLOUD_TYPE="public"
     export KUBE_VERSION="1.20.11-aliyun.1"
     export REGION=$(curl --retry 10 -sSL http://100.100.100.200/latest/meta-data/region-id)
     export PKG_FILE_SERVER="http://aliacs-k8s-$REGION.oss-$REGION-internal.aliyuncs.com/"
     export ACK_OPTIMIZED_OS_BUILD=1
 
-    mkdir -p /root/ack-deploy
-    cd /root/ack-deploy
+    if [[ "$RUNTIME" = "docker" ]]; then
+      RUNTIME_VERSION=${RUNTIME_VERSION:-19.03.15}
+      export RUNTIME_VERSION
+      DOCKER_VERSION=${RUNTIME_VERSION:-19.03.15}
+      export DOCKER_VERSION
+    else
+      RUNTIME_VERSION=${RUNTIME_VERSION:-1.5.13}
+      export RUNTIME_VERSION
+    fi
 
+    # setup k8s pull image prefix
+    if [[ -z "$KUBE_REPO_PREFIX" && -n "$REGION" ]]; then
+      export KUBE_REPO_PREFIX=registry-vpc.$REGION.aliyuncs.com/acs
+    fi
 }
 
 trim_os() {
@@ -162,18 +171,41 @@ xfsprogs
 }
 
 download_pkg() {
-    curl --retry 4 $PKG_FILE_SERVER/public/pkg/run/run-${KUBE_VERSION}.tar.gz -O
-    tar -zxvf run-${KUBE_VERSION}.tar.gz
+    export RELEASE_VERSION=$(echo $KUBE_VERSION | awk -F. '{print $1"."$2}')
+    curl --retry 4 $PKG_FILE_SERVER/public/pkg/run/run-${RELEASE_VERSION}-linux-${OS_ARCH}.tar.gz -O
+    tar -xvf run-${RELEASE_VERSION}-linux-${OS_ARCH}.tar.gz
 }
 
-install_pkg() {
-    ROLE=deploy-nodes pkg/run/$KUBE_VERSION/bin/kubernetes.sh
+
+source_file() {
+    ROLE=deploy-nodes pkg/run/$RELEASE_VERSION/bin/kubernetes.sh
 }
 
 preset_gpu() {
-    GPU_PACKAGE_URL=http://aliacs-k8s-${REGION}.oss-${REGION}-internal.aliyuncs.com/public/pkg
     if [[ "$PRESET_GPU" == "true" ]]; then
-        bash -x pkg/run/$KUBE_VERSION/bin/nvidia-gpu-installer.sh --package-url-prefix ${GPU_PACKAGE_URL}
+      for file_name in $(ls pkg/run/$RELEASE_VERSION/lib | grep -v init.sh); do
+          source pkg/run/$RELEASE_VERSION/lib/$file_name
+      done
+
+      if [[ $NVIDIA_DRIVER_VERSION == "" ]];then
+          export NVIDIA_DRIVER_VERSION=460.91.03
+      fi
+
+      nvidia::create_dir
+      # --nvidia-driver-runfile   指定驱动文件路径
+      nvidia::prepare_driver_package
+      # --nvidia-container-toolkit-rpms    指定nvidia container toolkit包含的rpm包所在目录
+      nvidia::prepare_container_runtime_package
+      # --nvidia-fabricmanager-rpm     指定nvidia fabric manager安装包（rpm格式）路径
+      nvidia::prepare_driver_package
+      # --nvidia-device-plugin-yaml     指定nvidia device plugin yaml文件路径
+      nvidia::deploy_static_pod
+
+      if [[ $RUNTIME == "docker" ]];then
+        export SKIP_CONTAINER_RUNTIME_CONFIG=true
+      fi
+
+      nvidia::gpu::installer::main
     fi
 }
 
@@ -182,21 +214,24 @@ pull_image() {
         systemctl start docker
         sleep 10
 
-        docker pull registry-vpc.${REGION}.aliyuncs.com/acs/kube-proxy:v${KUBE_VERSION}
-        docker pull registry-vpc.${REGION}.aliyuncs.com/acs/pause:3.2
-        docker pull registry-vpc.${REGION}.aliyuncs.com/acs/coredns:1.7.0
+        docker pull registry-${REGION}-vpc.ack.aliyuncs.com/acs/kube-proxy:v${KUBE_VERSION}
+        docker pull registry-vpc.${REGION}.aliyuncs.com/acs/pause:3.5
+        docker pull registry-vpc.${REGION}.aliyuncs.com/acs/coredns:1.6.7
     else
         systemctl start containerd
         sleep 10
 
-        ctr -n k8s.io i pull registry-vpc.${REGION}.aliyuncs.com/acs/kube-proxy:v${KUBE_VERSION}
-        ctr -n k8s.io i pull registry-vpc.${REGION}.aliyuncs.com/acs/pause:3.2
-        ctr -n k8s.io i pull registry-vpc.${REGION}.aliyuncs.com/acs/coredns:1.7.0
+        ctr -n k8s.io i pull registry-${REGION}-vpc.ack.aliyuncs.com/acs/kube-proxy:v${KUBE_VERSION}
+        ctr -n k8s.io i pull registry-vpc.${REGION}.aliyuncs.com/acs/pause:3.5
+        ctr -n k8s.io i pull registry-vpc.${REGION}.aliyuncs.com/acs/coredns:1.6.7
     fi
 }
 
 update_os_release() {
-    sed -i "s#LTS#LTS ACK-Optimized-OS#" /etc/image-id
+    if [[ ! -f /etc/image-id ]]; then
+      touch /etc/image-id
+    fi
+    sed -i  "s#LTS#LTS ACK-Optimized-OS#"  /etc/image-id
 }
 
 record_k8s_version() {
@@ -213,6 +248,12 @@ post_install() {
     fi
 }
 
+keep_container_data() {
+    if [[ "$KEEP_IMAGE_DATA" = "true" ]]; then
+        touch /var/.keep-container-data
+    fi
+}
+
 cleanup() {
     rm -rf /root/ack-deploy
 }
@@ -226,9 +267,10 @@ main() {
     trim_os
 
     download_pkg
-    install_pkg
+    source_file
     preset_gpu
     pull_image
+    keep_container_data
     update_os_release
     record_k8s_version
     post_install

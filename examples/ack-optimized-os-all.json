@@ -1,8 +1,8 @@
 {
   "variables": {
-    "image_name": "ack-optimized_image-1.18-{{timestamp}}",
+    "image_name": "ack-optimized_image-1.20-{{timestamp}}",
     "source_image": "aliyun_2_1903_x64_20G_alibase_20210120.vhd",
-    "instance_type": "ecs.g6.2xlarge",
+    "instance_type": "ecs.gn6i-c4g1.xlarge",
     "region": "{{env `ALICLOUD_REGION`}}",
     "access_key": "{{env `ALICLOUD_ACCESS_KEY`}}",
     "secret_key": "{{env `ALICLOUD_SECRET_KEY`}}",
@@ -26,7 +26,7 @@
   "provisioners": [
     {
       "type": "file",
-      "source": "scripts/ack-optimized-os-1.18.sh",
+      "source": "scripts/ack-optimized-os-all.sh",
       "destination": "/root/"
     },
     {
@@ -35,7 +35,12 @@
         "export RUNTIME={{user `runtime`}}",
         "export SKIP_SECURITY_FIX={{user `skip_secrutiy_fix`}}",
         "export OS_ARCH=amd64",
-        "bash /root/ack-optimized-os-1.18.sh"
+        "export PRESET_GPU=true",
+        "export NVIDIA_DRIVER_VERSION=460.106.00",
+        "export KEEP_IMAGE_DATA=true",
+        "export KUBE_VERSION=1.26.3-aliyun.1",
+        "bash /root/ack-optimized-os-all.sh",
+        "ctr -n k8s.io i pull docker.io/library/nginx:1.7.9"
       ]
     }
   ]

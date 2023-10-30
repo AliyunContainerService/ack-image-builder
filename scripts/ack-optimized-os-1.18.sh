@@ -39,8 +39,10 @@ check_params() {
 setup_env() {
     export RUNTIME
     export OS="AliyunOS"
-    export RUNTIME_VERSION="1.5.10"
-    export DOCKER_VERSION="19.03.5"
+    RUNTIME_VERSION=${RUNTIME_VERSION:-1.4.4}
+    export RUNTIME_VERSION
+    DOCKER_VERSION=${DOCKER_VERSION:-19.03.5}
+    export DOCKER_VERSION
     export KUBE_VERSION="1.18.8-aliyun.1"
     export REGION=$(curl --retry 10 -sSL http://100.100.100.200/latest/meta-data/region-id)
     export PKG_FILE_SERVER="http://aliacs-k8s-$REGION.oss-$REGION-internal.aliyuncs.com/$BETA_VERSION"
@@ -60,13 +62,6 @@ source_file() {
 install_pkg() {
     public::common::sync_ntpd
     public::common::install_package
-}
-
-preset_gpu() {
-    GPU_PACKAGE_URL=http://aliacs-k8s-${REGION}.oss-${REGION}-internal.aliyuncs.com/public/pkg
-    if [[ "$PRESET_GPU" == "true" ]]; then
-        bash -x pkg/run/$KUBE_VERSION/bin/nvidia-gpu-installer.sh --package-url-prefix ${GPU_PACKAGE_URL}
-    fi
 }
 
 trim_os() {
@@ -227,7 +222,6 @@ main() {
     download_pkg
     source_file
     install_pkg
-    preset_gpu
     pull_image
     update_os_release
     record_k8s_version
