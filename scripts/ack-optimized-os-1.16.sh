@@ -190,7 +190,10 @@ pull_image() {
 }
 
 update_os_release() {
-    sed -i  "s#LTS#LTS ACK-Optimized-OS#"  /etc/image-id
+    if [[ ! -f /etc/image-id ]]; then
+      touch /etc/image-id
+    fi
+    echo "custom_tag:ACK-Optimized-OS" >> /etc/image-id
 }
 
 record_k8s_version() {
