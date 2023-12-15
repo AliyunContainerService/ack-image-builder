@@ -37,7 +37,6 @@ check_params() {
 }
 
 setup_env() {
-    export RUNTIME
     export OS="AliyunOS"
 
     if [[ "$RUNTIME" = "docker" ]]; then
@@ -49,8 +48,6 @@ setup_env() {
       RUNTIME_VERSION=${RUNTIME_VERSION:-1.6.20}
       export RUNTIME_VERSION
     fi
-
-    export RELEASE_VERSION=$(echo $KUBE_VERSION | awk -F. '{print $1"."$2}')
 
     export REGION=$(curl --retry 10 -sSL http://100.100.100.200/latest/meta-data/region-id)
     export PKG_FILE_SERVER="http://aliacs-k8s-$REGION.oss-$REGION-internal.aliyuncs.com/$BETA_VERSION"
@@ -184,6 +181,7 @@ libdrm
 libmpc
 libpciaccess
 libpng
+libreport-filesystem
 lm_sensors-libs
 lsscsi
 lvm2
@@ -193,12 +191,18 @@ man-db
 mariadb-libs
 mdadm
 microcode_ctl
+mpfr
+NetworkManager
+NetworkManager-libnm
+NetworkManager-team
+NetworkManager-tui
 patch
 perl-Getopt-Long
 plymouth
 plymouth-scripts
 postfix
 python3
+python3-libs
 python3-pip
 python3-setuptools
 python-decorator
