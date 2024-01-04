@@ -184,8 +184,9 @@ source_file() {
 
 preset_gpu() {
     if [[ "$PRESET_GPU" == "true" ]]; then
-      for file_name in $(ls pkg/run/$RELEASE_VERSION/lib | grep -v init.sh); do
-          source pkg/run/$RELEASE_VERSION/lib/$file_name
+      export SRC_DIR=pkg/run/$RELEASE_VERSION
+      for file_name in $(ls $SRC_DIR/lib | grep -v init.sh | grep -v common.sh | grep -v log.sh); do
+          source $SRC_DIR/lib/$file_name
       done
 
       if [[ $NVIDIA_DRIVER_VERSION == "" ]];then
