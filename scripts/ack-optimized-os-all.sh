@@ -88,36 +88,43 @@ install_pkg() {
 
 preset_gpu() {
 
-    if [[ $(echo "${KUBE_VERSION}" | cut -d. -f2) -lt 20 ]]; then
+    if [[ "$PRESET_GPU" != "true" ]]; then
       return
     fi
 
-    if [[ "$PRESET_GPU" == "true" ]]; then
+    if [[ $(echo "${KUBE_VERSION}" | cut -d. -f2) -lt 20 ]]; then
+      return
+    elif [[ $(echo "${KUBE_VERSION}" | cut -d. -f2) -eq 20 ]]; then
       for file_name in $(ls pkg/run/$RELEASE_VERSION/lib | grep -v init.sh); do
-          source pkg/run/$RELEASE_VERSION/lib/$file_name
+        source pkg/run/$RELEASE_VERSION/lib/$file_name
       done
-
-      if [[ $NVIDIA_DRIVER_VERSION == "" ]];then
-          export NVIDIA_DRIVER_VERSION=460.91.03
-      fi
-
-      nvidia::create_dir
-      # --nvidia-driver-runfile   指定驱动文件路径
-      nvidia::prepare_driver_package
-      # --nvidia-container-toolkit-rpms    指定nvidia container toolkit包含的rpm包所在目录
-      nvidia::prepare_container_runtime_package
-      # --nvidia-fabricmanager-rpm     指定nvidia fabric manager安装包（rpm格式）路径
-      nvidia::prepare_driver_package
-      # --nvidia-device-plugin-yaml     指定nvidia device plugin yaml文件路径
-      nvidia::deploy_static_pod
-
-      if [[ $RUNTIME == "docker" ]];then
-        export SKIP_CONTAINER_RUNTIME_CONFIG=true
-      fi
-
-      nvidia::gpu::installer::main
-
+    else
+      export SRC_DIR=pkg/run/$RELEASE_VERSION
+      for file_name in $(ls $SRC_DIR/lib | grep -v init.sh | grep -v common.sh | grep -v log.sh); do
+        source $SRC_DIR/lib/$file_name
+      done
     fi
+
+    if [[ $NVIDIA_DRIVER_VERSION == "" ]];then
+        export NVIDIA_DRIVER_VERSION=460.91.03
+    fi
+
+    nvidia::create_dir
+    # --nvidia-driver-runfile   指定驱动文件路径
+    nvidia::prepare_driver_package
+    # --nvidia-container-toolkit-rpms    指定nvidia container toolkit包含的rpm包所在目录
+    nvidia::prepare_container_runtime_package
+    # --nvidia-fabricmanager-rpm     指定nvidia fabric manager安装包（rpm格式）路径
+    nvidia::prepare_driver_package
+    # --nvidia-device-plugin-yaml     指定nvidia device plugin yaml文件路径
+    nvidia::deploy_static_pod
+
+    if [[ $RUNTIME == "docker" ]];then
+      export SKIP_CONTAINER_RUNTIME_CONFIG=true
+    fi
+
+    nvidia::gpu::installer::main
+
 }
 
 trim_os() {
