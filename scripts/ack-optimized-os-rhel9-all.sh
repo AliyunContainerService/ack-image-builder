@@ -157,7 +157,6 @@ geoipupdate
 gettext
 gettext-libs
 glibc-devel
-groff-base
 hunspell
 hunspell-en
 hunspell-en-GB
@@ -204,7 +203,6 @@ NetworkManager-libnm
 NetworkManager-team
 NetworkManager-tui
 patch
-perl-Getopt-Long
 plymouth
 plymouth-scripts
 postfix
@@ -241,15 +239,13 @@ pull_image() {
         sleep 10
 
         docker pull registry-${REGION}-vpc.ack.aliyuncs.com/acs/kube-proxy:v${KUBE_VERSION}
-        docker pull registry-vpc.${REGION}.aliyuncs.com/acs/pause:3.5
-        docker pull registry-vpc.${REGION}.aliyuncs.com/acs/coredns:1.6.7
+        docker pull registry-${REGION}-vpc.ack.aliyuncs.com/acs/pause:3.5
     else
         systemctl start containerd
         sleep 10
 
         ctr -n k8s.io i pull registry-${REGION}-vpc.ack.aliyuncs.com/acs/kube-proxy:v${KUBE_VERSION}
-        ctr -n k8s.io i pull registry-vpc.${REGION}.aliyuncs.com/acs/pause:3.5
-        ctr -n k8s.io i pull registry-vpc.${REGION}.aliyuncs.com/acs/coredns:1.6.7
+        ctr -n k8s.io i registry-${REGION}-vpc.ack.aliyuncs.com/acs/pause:3.5
     fi
 }
 

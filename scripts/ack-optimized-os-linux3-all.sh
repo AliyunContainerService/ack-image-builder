@@ -38,7 +38,6 @@ check_params() {
 
 setup_env() {
     export RUNTIME
-    export OS="AliyunOS"
 
     if [[ "$RUNTIME" = "docker" ]]; then
       RUNTIME_VERSION=${RUNTIME_VERSION:-19.03.15}
@@ -61,7 +60,6 @@ setup_env() {
       export KUBE_REPO_PREFIX=registry-vpc.$REGION.aliyuncs.com/acs
     fi
 }
-
 
 download_pkg() {
     if [[ $(echo "${KUBE_VERSION}" | cut -d. -f1) -ge 1 && $(echo "${KUBE_VERSION}" | cut -d. -f2) -ge 20 ]]; then
@@ -160,7 +158,6 @@ geoipupdate
 gettext
 gettext-libs
 glibc-devel
-groff-base
 hunspell
 hunspell-en
 hunspell-en-GB
@@ -191,6 +188,7 @@ libdrm
 libmpc
 libpciaccess
 libpng
+libreport-filesystem
 lm_sensors-libs
 lsscsi
 lvm2
@@ -200,12 +198,17 @@ man-db
 mariadb-libs
 mdadm
 microcode_ctl
+mpfr
+NetworkManager
+NetworkManager-libnm
+NetworkManager-team
+NetworkManager-tui
 patch
-perl-Getopt-Long
 plymouth
 plymouth-scripts
 postfix
 python3
+python3-libs
 python3-pip
 python3-setuptools
 python-decorator
@@ -237,15 +240,13 @@ pull_image() {
         sleep 10
 
         docker pull registry-${REGION}-vpc.ack.aliyuncs.com/acs/kube-proxy:v${KUBE_VERSION}
-        docker pull registry-vpc.${REGION}.aliyuncs.com/acs/pause:3.5
-        docker pull registry-vpc.${REGION}.aliyuncs.com/acs/coredns:1.6.7
+        docker pull registry-${REGION}-vpc.ack.aliyuncs.com/acs/pause:3.5
     else
         systemctl start containerd
         sleep 10
 
         ctr -n k8s.io i pull registry-${REGION}-vpc.ack.aliyuncs.com/acs/kube-proxy:v${KUBE_VERSION}
-        ctr -n k8s.io i pull registry-vpc.${REGION}.aliyuncs.com/acs/pause:3.5
-        ctr -n k8s.io i pull registry-vpc.${REGION}.aliyuncs.com/acs/coredns:1.6.7
+        ctr -n k8s.io i pull registry-${REGION}-vpc.ack.aliyuncs.com/acs/pause:3.5
     fi
 }
 
