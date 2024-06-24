@@ -82,7 +82,6 @@ geoipupdate
 gettext
 gettext-libs
 glibc-devel
-groff-base
 hunspell
 hunspell-en
 hunspell-en-GB
@@ -129,7 +128,6 @@ NetworkManager-libnm
 NetworkManager-team
 NetworkManager-tui
 patch
-perl-Getopt-Long
 plymouth
 plymouth-scripts
 postfix
@@ -203,8 +201,7 @@ pull_image() {
     sleep 10
 
     ctr -n k8s.io i pull registry-${REGION}-vpc.ack.aliyuncs.com/acs/kube-proxy:v${KUBE_VERSION}
-    ctr -n k8s.io i pull registry-vpc.${REGION}.aliyuncs.com/acs/pause:3.5
-    ctr -n k8s.io i pull registry-vpc.${REGION}.aliyuncs.com/acs/coredns:1.7.0
+    ctr -n k8s.io i pull registry-${REGION}-vpc.ack.aliyuncs.com/acs/pause:3.5
 }
 
 update_os_release() {
