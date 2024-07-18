@@ -6,9 +6,9 @@ This repository contains resources and configuration scripts for building a cust
 
 ## Supported OS
 
-* Aliyun Linux 2 (Alibaba Cloud Linux 2)
-* Aliyun Linux 3 (Alibaba Cloud Linux 3)
-* CentOS 7.6/7.7/7.8/7.9
+* Alibaba Cloud Linux 3
+* Alibaba Cloud Linux 2  - deprecated
+* CentOS 7.6/7.7/7.8/7.9 - deprecated
 * Red Hat Enterprise Linux 9
 * Anolis OS 8
 
@@ -27,7 +27,7 @@ Execute following scripts in your shell
 export ALICLOUD_REGION=XXX
 export ALICLOUD_ACCESS_KEY=XXX
 export ALICLOUD_SECRET_KEY=XXX
-packer build examples/ack-aliyunlinux2.json
+packer build examples/ack-aliyunlinux3.json
 ```
 
 ## Build ACK-Optimized-OS image
@@ -46,8 +46,8 @@ NOTE: `RUNTIME` only support `docker` and `containerd`
 ```shell
 {
   "variables": {
-    "image_name": "ack-optimized_image-1.20-{{timestamp}}",
-    "source_image": "aliyun_2_1903_x64_20G_alibase_20210120.vhd",
+    "image_name": "ack-optimized_image-1.28-{{timestamp}}",
+    "source_image": "aliyun_3_9_x64_20G_alibase_20231219.vhd",
     "instance_type": "ecs.gn6i-c4g1.xlarge",
     "region": "{{env `ALICLOUD_REGION`}}",
     "access_key": "{{env `ALICLOUD_ACCESS_KEY`}}",
@@ -84,7 +84,7 @@ NOTE: `RUNTIME` only support `docker` and `containerd`
         "export PRESET_GPU=true",    # If you want to download gpu, set PRESET_GPU to true and also set instance_type to gpu instance, supports version 1.20+.
         "export NVIDIA_DRIVER_VERSION=460.106.00",   #  You can set the gpu version, default is 460.91.03
         "export KEEP_IMAGE_DATA=true",   #  If you cache images, you must set KEEP_IMAGE_DATA to true
-        "export KUBE_VERSION=1.26.3-aliyun.1",   #  Set KUBE_VERSION according to your cluster version
+        "export KUBE_VERSION=1.28.9-aliyun.1",   #  Set KUBE_VERSION according to your cluster version
         "bash /root/ack-optimized-os-all.sh",
         "ctr -n k8s.io i pull docker.io/library/nginx:1.7.9"  #  You can cache images into OS image
       ]
