@@ -1,6 +1,6 @@
 # Image Build Specification of Alibaba Cloud Container Service for Kubernetes (ACK) 
 
-Notes: The template [ack-centos.json](https://github.com/AliyunContainerService/ack-image-builder/blob/master/ack-centos.json) is used for building custom image for ACK cluster based on the latest published ecs centos public image.
+Notes: The template [ack-aliyunlinux2.json](https://github.com/AliyunContainerService/ack-image-builder/blob/master/examples/ack-aliyunlinux2.json) is used for building custom image for ACK cluster based on the latest published ecs aliyun public image.
 
 This repository contains resources and configuration scripts for building a custom base OS Image for ACK with [HashiCorp Packer](https://www.packer.io/).
 
@@ -24,6 +24,7 @@ For more information, see [Alibaba Cloud builder](https://www.packer.io/docs/bui
 Execute following scripts in your shell
 
 ```
+source os.properties
 export ALICLOUD_REGION=XXX
 export ALICLOUD_ACCESS_KEY=XXX
 export ALICLOUD_SECRET_KEY=XXX
@@ -35,6 +36,7 @@ packer build examples/ack-aliyunlinux3.json
 Execute following scripts in your shell
 
 ```
+source os.properties
 export RUNTIME=XXX
 export ALICLOUD_REGION=XXX
 export ALICLOUD_ACCESS_KEY=XXX
