@@ -225,10 +225,102 @@ post_install() {
     fi
 }
 
-keep_container_data() {
-    if [[ "$KEEP_IMAGE_DATA" = "true" ]]; then
-        touch /var/.keep-container-data
+mount_data_disk() {
+    set -e
+    if [[ "$MOUNT_RUNTIME_DATADISK" != "true" ]]; then
+        return 0
     fi
+
+    local runtime_dir
+    if [[ "$RUNTIME" = "containerd" ]]; then
+        runtime_dir="containerd"
+    else
+        runtime_dir="docker"
+    fi
+
+    #check to see whether docker or containerd is already mounted.
+    if cat /etc/fstab | grep -E "/var/lib/${runtime_dir}"; then
+        # Assume user take over disk management or disk has already mounted. return immediately.
+        log_warn " /var/lib/${runtime_dir} has been mounted. return"
+        return 0
+    fi
+
+    if [ "$DATA_DISK_SERIAL_ID" != "" ]; then
+        devices=$(lsblk -l -n -o NAME -d -p)
+        for dev in $devices; do
+            if udevadm info --query=all --name=$dev | grep "ID_SERIAL=" | grep "$DATA_DISK_SERIAL_ID"; then
+                DISK_DEVICE=$dev
+                break
+            fi
+        done
+        if [ "$DISK_DEVICE" == "" ]; then
+            log_warn "specified disk device ${DATA_DISK_SERIAL_ID} not found. return"
+            return 0
+        fi
+    fi
+
+    # initialize device name.
+    if [ "$DISK_DEVICE" != "" ]; then
+        device=$DISK_DEVICE
+    else
+        # refuse to mount & format disk if it has only one disk.
+        diskcnt=$(lsblk -l -n -o NAME -d -p | wc -l)
+        if [ "$diskcnt" -le 1 ]; then
+            echo "WARNING: node has only one disk, refuse fdisk op."
+            return
+        fi
+
+        # search for the last device of /dev/*vd*. compatible with local ssd
+        # Consider this device to be aliyun disk.
+        # compatible with legacy installation.
+        if lsblk -l -n -o NAME -d -p | grep nvme; then
+            device=$(lsblk -l -n -o NAME -d -p | grep nvme | sort | tail -n 1)
+        else
+            device=$(lsblk -l -n -o NAME -d -p | sort | tail -n 1)
+        fi
+    fi
+    if [ ! -b "$device" ]; then
+        echo "auto_fdisk fail: [$device] is not a block device"
+        return 1
+    fi
+
+    export DATA_DISK_SERIAL_ID=$(udevadm info --query=all --name=$device | grep ID_SERIAL | sed -n 's/.*ID_SERIAL=\(.*\)/\1/p')
+
+    # choose the real partition name. exactly the first partition eg.
+    # /dev/vda
+    # /dev/vda1
+    rdevice=$(lsblk -l -n -o NAME -p ${device} | head -n 2 | tail -n 1)
+
+    # check existing fs type. xfs must formated with fstype=1 parameter.
+    fstype=$(lsblk -l -n -f -o FSTYPE $rdevice)
+    case $fstype in
+    "")
+        # not formatted. do mkfs.
+        AUTO_FDISK_FSTYPE=${AUTO_FDISK_FSTYPE:-ext4}
+        case $AUTO_FDISK_FSTYPE in
+        "ext4")
+            mkfs.ext4 -i 8192 "$rdevice"
+            ;;
+        "xfs")
+            mkfs.xfs -n ftype=1 "$rdevice"
+            ;;
+        *)
+            echo "InvalidFsType" "invalid fs type $AUTO_FDISK_FSTYPE"
+            ;;
+        esac
+        fstype="$AUTO_FDISK_FSTYPE"
+        ;;
+    "xfs")
+        # check for xfs parameter.
+        if ! xfs_info "$rdevice" | grep ftype=1; then
+            echo "InvalidXfs" "xfs filesystem must formated with parameter fstype=1, docker required"
+        fi
+        ;;
+    esac
+
+    mkdir -p /var/lib/container
+    mount ${rdevice} /var/lib/container/
+    echo "mountDataDiskDone"
 }
 
 cleanup() {
