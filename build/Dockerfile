@@ -1,5 +1,5 @@
 FROM alpine:3.23.4
-
+RUN apk --no-cache --update upgrade && rm -rf /var/cache/apk/*
 ADD  https://releases.hashicorp.com/packer/1.15.1/packer_1.15.1_linux_amd64.zip /packer_1.15.1_linux_amd64.zip
 ADD ./scripts /scripts
 ADD ./config /config

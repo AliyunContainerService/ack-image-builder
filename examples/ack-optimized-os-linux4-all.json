@@ -1,0 +1,43 @@
+{
+  "variables": {
+    "image_name": "ack-optimized_image-1.36-{{timestamp}}",
+    "source_image":"aliyun_4_x64_20G_container_optimized_alibase_20260430.vhd",
+    "instance_type": "ecs.c8i.xlarge",
+    "region": "{{env `ALICLOUD_REGION`}}",
+    "access_key": "{{env `ALICLOUD_ACCESS_KEY`}}",
+    "secret_key": "{{env `ALICLOUD_SECRET_KEY`}}"
+  },
+  "builders": [
+    {
+      "type": "alicloud-ecs",
+      "access_key": "{{user `access_key`}}",
+      "secret_key": "{{user `secret_key`}}",
+      "region": "{{user `region`}}",
+      "image_name": "{{user `image_name`}}",
+      "source_image": "{{user `source_image`}}",
+      "ssh_username": "root",
+      "instance_type": "{{user `instance_type`}}",
+      "skip_image_validation": "true",
+      "io_optimized": "true"
+    }
+  ],
+  "provisioners": [{
+    "type": "file",
+    "source": "scripts/ack-optimized-os-linux4-all.sh",
+    "destination": "/root/"
+  },
+    {
+      "type": "shell",
+      "inline": [
+        "export RUNTIME=containerd",
+        "export RUNTIME_VERSION=2.1.8",
+        "export SKIP_SECURITY_FIX=true",
+        "export KUBE_VERSION=1.36.1-aliyun.1",
+        "export OS_ARCH=amd64",
+        "bash /root/ack-optimized-os-linux4-all.sh",
+        "touch /var/.skip-yum",
+        "# Add cached images here for faster bootstrapping (e.g., cluster components or business images)",
+        "# Example: ctr -n k8s.io i pull registry.example.com/acs/pause:3.9"
+      ]
+    }]
+}

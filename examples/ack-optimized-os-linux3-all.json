@@ -1,13 +1,11 @@
 {
   "variables": {
-    "image_name": "ack-optimized_image-1.28-{{timestamp}}",
-    "source_image": "aliyun_3_9_x64_20G_alibase_20231219.vhd",
-    "instance_type": "ecs.gn6i-c4g1.xlarge",
+    "image_name": "ack-optimized_image-1.22-{{timestamp}}",
+    "source_image": "aliyun_3_x64_20G_alibase_20230110.vhd",
+    "instance_type": "ecs.c6.xlarge",
     "region": "{{env `ALICLOUD_REGION`}}",
     "access_key": "{{env `ALICLOUD_ACCESS_KEY`}}",
-    "secret_key": "{{env `ALICLOUD_SECRET_KEY`}}",
-    "runtime": "{{env `RUNTIME`}}",
-    "skip_secrutiy_fix": "{{env `SKIP_SECURITY_FIX`}}"
+    "secret_key": "{{env `ALICLOUD_SECRET_KEY`}}"
   },
   "builders": [
     {
@@ -23,27 +21,23 @@
       "io_optimized": "true"
     }
   ],
-  "provisioners": [
-    {
+  "provisioners": [{
       "type": "file",
-      "source": "scripts/ack-optimized-os-all.sh",
+      "source": "scripts/ack-optimized-os-linux3-all.sh",
       "destination": "/root/"
     },
     {
       "type": "shell",
       "inline": [
-        "export RUNTIME={{user `runtime`}}",
-        "export SKIP_SECURITY_FIX={{user `skip_secrutiy_fix`}}",
+        "export RUNTIME=containerd",
+        "export RUNTIME_VERSION=1.6.20",
+        "export SKIP_SECURITY_FIX=true",
         "export OS_ARCH=amd64",
-        "export PRESET_GPU=true",
-        "export NVIDIA_DRIVER_VERSION=460.106.00",
-        "export KEEP_IMAGE_DATA=true",
-        "export KUBE_VERSION=1.28.9-aliyun.1",
-        "bash /root/ack-optimized-os-all.sh",
+        "export KUBE_VERSION=1.22.3-aliyun.1",
+        "bash /root/ack-optimized-os-linux3-all.sh",
         "touch /var/.skip-yum",
         "# Add cached images here for faster bootstrapping (e.g., cluster components or business images)",
-        "# Example: ctr -n k8s.io i pull registry.example.com/acs/pause:3.5"
+        "# Example: ctr -n k8s.io i pull registry.example.com/acs/pause:3.9"
       ]
-    }
-  ]
+    }]
 }
